@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Move styles from index.html here for better organization */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: #FCFCFC;
+  color: #1A1A1A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.glass-nav {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #EDEDED;
+}
+
+.product-card {
+  background: #FFFFFF;
+  border: 1px solid #EDEDED;
+  transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.product-card:hover {
+  border-color: #1A1A1A;
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.04);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F9F9F9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E0E0E0;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D0D0D0;
+}
