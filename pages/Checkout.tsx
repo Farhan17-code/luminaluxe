@@ -295,7 +295,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   couponError 
 }) => {
   const { cart, total } = useCart();
-  const shipping = 15.00;
+  const shipping = 1.00;
   
   let discountAmount = 0;
   if (activeCoupon) {
