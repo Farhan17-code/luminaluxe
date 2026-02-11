@@ -156,8 +156,8 @@ const Checkout: React.FC = () => {
                 </div>
                 {/* Phone Number */}
                 <input type="tel" placeholder="Mobile Number *" value={phone} onChange={e => setPhone(e.target.value)} className={INPUT_CLASS} />
-                {/* Street Address */}
-                <input type="text" placeholder="Street Address *" value={address} onChange={e => setAddress(e.target.value)} className={INPUT_CLASS} />
+                {/* Full Address */}
+                <input type="text" placeholder="Full Address *" value={address} onChange={e => setAddress(e.target.value)} className={INPUT_CLASS} />
                 {/* Division & District Dropdowns */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="relative">
@@ -219,7 +219,7 @@ const Checkout: React.FC = () => {
                 <div className="p-6 bg-white border-2 border-blue-500 rounded-2xl flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <CreditCard className="w-6 h-6 text-blue-500" />
-                    <span className="font-bold">Credit / Debit Card</span>
+                    <span className="font-bold">Cash On Delivery</span>
                   </div>
                   <div className="w-4 h-4 rounded-full border-4 border-blue-500" />
                 </div>
@@ -228,7 +228,7 @@ const Checkout: React.FC = () => {
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
-                    <h4 className="font-bold">Stripe Secure Checkout</h4>
+                    <h4 className="font-bold">Cash On Delivery</h4>
                     <p className="text-sm text-gray-400">You will be redirected to a secure payment page.</p>
                   </div>
                 </div>
