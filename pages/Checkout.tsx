@@ -1,11 +1,11 @@
-
 import React, { useState } from 'react';
 // Fix: Use motion/react for consistent animations and fix react-router imports
 import { motion, AnimatePresence } from 'motion/react';
-import { CreditCard, Truck, CheckCircle, ArrowLeft, ArrowRight, ShieldCheck } from 'lucide-react';
+import { CreditCard, Truck, CheckCircle, ArrowLeft, ArrowRight, ShieldCheck, Tag, Loader2, XCircle } from 'lucide-react';
 import { useCart } from '../contexts';
 import { useNavigate } from 'react-router';
 import { supabase } from '../services/supabase';
+import { Coupon } from '../types';
 
 type Step = 'shipping' | 'payment' | 'success';
 
@@ -14,6 +14,9 @@ const Checkout: React.FC = () => {
   const [step, setStep] = useState<Step>('shipping');
   const [loading, setLoading] = useState(false);
   const [couponCode, setCouponCode] = useState('');
+  const [activeCoupon, setActiveCoupon] = useState<Coupon | null>(null);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Check for success query param
@@ -25,6 +28,28 @@ const Checkout: React.FC = () => {
     }
   }, []);
 
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    
+    setValidatingCoupon(true);
+    setCouponError(null);
+    
+    try {
+      const coupon = await supabase.getCouponByCode(couponCode.trim());
+      if (coupon) {
+        setActiveCoupon(coupon);
+        setCouponError(null);
+      } else {
+        setActiveCoupon(null);
+        setCouponError('Invalid or expired promo code');
+      }
+    } catch (error) {
+      setCouponError('Error validating coupon');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
   const handleComplete = async () => {
     setLoading(true);
     try {
@@ -33,7 +58,7 @@ const Checkout: React.FC = () => {
         total: 0,    // Server handles
         status: 'pending',
         items: cart
-      }, couponCode);
+      }, activeCoupon?.code || undefined);
 
       // Redirect to Stripe or Success Page
       if (url) {
@@ -107,7 +132,14 @@ const Checkout: React.FC = () => {
                 Proceed to Payment <ArrowRight className="w-5 h-5" />
               </button>
             </div>
-            <OrderSummary couponCode={couponCode} onCouponChange={setCouponCode} />
+            <OrderSummary 
+              couponCode={couponCode} 
+              onCouponChange={setCouponCode} 
+              onApplyCoupon={handleApplyCoupon}
+              activeCoupon={activeCoupon}
+              validatingCoupon={validatingCoupon}
+              couponError={couponError}
+            />
           </motion.div>
         )}
 
@@ -158,7 +190,7 @@ const Checkout: React.FC = () => {
                 </button>
               </div>
             </div>
-            <OrderSummary couponCode={couponCode} />
+            <OrderSummary activeCoupon={activeCoupon} />
           </motion.div>
         )}
 
@@ -186,8 +218,37 @@ const Checkout: React.FC = () => {
   );
 };
 
-const OrderSummary: React.FC<{ couponCode?: string, onCouponChange?: (code: string) => void }> = ({ couponCode, onCouponChange }) => {
+interface OrderSummaryProps {
+  couponCode?: string;
+  onCouponChange?: (code: string) => void;
+  onApplyCoupon?: () => void;
+  activeCoupon?: Coupon | null;
+  validatingCoupon?: boolean;
+  couponError?: string | null;
+}
+
+const OrderSummary: React.FC<OrderSummaryProps> = ({ 
+  couponCode, 
+  onCouponChange, 
+  onApplyCoupon, 
+  activeCoupon, 
+  validatingCoupon,
+  couponError 
+}) => {
   const { cart, total } = useCart();
+  const shipping = 15.00;
+  
+  let discountAmount = 0;
+  if (activeCoupon) {
+    if (activeCoupon.discount_type === 'percentage') {
+      discountAmount = total * (activeCoupon.value / 100);
+    } else {
+      discountAmount = activeCoupon.value;
+    }
+  }
+
+  const finalTotal = Math.max(0, total + shipping - discountAmount);
+
   return (
     <div className="glass p-8 rounded-[32px] h-fit sticky top-24">
       <h3 className="text-xl font-bold mb-6">Summary</h3>
@@ -202,16 +263,50 @@ const OrderSummary: React.FC<{ couponCode?: string, onCouponChange?: (code: stri
 
       {onCouponChange && (
         <div className="mb-8 space-y-3">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Promo Code</label>
+          <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
+            <Tag className="w-3 h-3 text-blue-400" /> Promo Code
+          </label>
           <div className="flex gap-2">
             <input
               type="text"
               value={couponCode}
               onChange={(e) => onCouponChange(e.target.value)}
-              placeholder="WELCOME10"
-              className="flex-grow p-3 bg-white/5 rounded-xl outline-none focus:ring-1 focus:ring-blue-500 text-sm"
+              placeholder="e.g. WELCOME10"
+              className={`flex-grow p-3 bg-white/5 rounded-xl outline-none focus:ring-1 text-sm transition-all ${
+                couponError ? 'focus:ring-red-500 border border-red-500/30' : 
+                activeCoupon ? 'focus:ring-emerald-500 border border-emerald-500/30' : 'focus:ring-blue-500'
+              }`}
             />
+            <button
+              onClick={onApplyCoupon}
+              disabled={validatingCoupon || !couponCode}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+            >
+              {validatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+            </button>
           </div>
+          {couponError && (
+            <div className="flex items-center gap-1.5 text-red-400 text-[10px] font-bold uppercase tracking-wide">
+              <XCircle className="w-3 h-3" /> {couponError}
+            </div>
+          )}
+          {activeCoupon && (
+            <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
+              <CheckCircle className="w-3 h-3" /> Discount Applied: {activeCoupon.code}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!onCouponChange && activeCoupon && (
+        <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Tag className="w-4 h-4 text-emerald-400" />
+            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">{activeCoupon.code}</span>
+          </div>
+          <span className="text-xs font-black text-emerald-400">
+            -{activeCoupon.discount_type === 'percentage' ? `${activeCoupon.value}%` : `$${activeCoupon.value.toFixed(2)}`}
+          </span>
         </div>
       )}
 
@@ -222,15 +317,23 @@ const OrderSummary: React.FC<{ couponCode?: string, onCouponChange?: (code: stri
         </div>
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Shipping (Express)</span>
-          <span>$15.00</span>
+          <span>${shipping.toFixed(2)}</span>
         </div>
+        {discountAmount > 0 && (
+          <div className="flex justify-between items-center text-sm text-emerald-400 font-bold">
+            <span className="flex items-center gap-1.5">
+              Discount {activeCoupon?.discount_type === 'percentage' && `(${activeCoupon.value}%)`}
+            </span>
+            <span>-${discountAmount.toFixed(2)}</span>
+          </div>
+        )}
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Taxes (Estimated)</span>
           <span>$0.00</span>
         </div>
         <div className="flex justify-between items-center text-xl font-black pt-4">
           <span>Total</span>
-          <span className="text-blue-400">${(total + 15).toFixed(2)}</span>
+          <span className="text-blue-400">${finalTotal.toFixed(2)}</span>
         </div>
       </div>
     </div>
