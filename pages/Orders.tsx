@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingBag, Package, Truck, CheckCircle2, XCircle, ChevronRight, ArrowLeft, History, DollarSign, Calendar } from 'lucide-react';
@@ -142,7 +141,7 @@ const Orders: React.FC = () => {
                                                 </div>
                                             </div>
                                             <div className="text-right">
-                                                <p className="font-black text-sm">${(item.price_at_time * item.quantity).toFixed(2)}</p>
+                                                <p className="font-black text-sm">৳{(item.price_at_time * item.quantity).toFixed(2)}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -156,7 +155,7 @@ const Orders: React.FC = () => {
                                     </div>
                                     <div className="text-right space-y-1">
                                         <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Total Investment</p>
-                                        <p className="text-2xl font-black">${Number(order.total).toFixed(2)}</p>
+                                        <p className="text-2xl font-black">৳{Number(order.total).toFixed(2)}</p>
                                     </div>
                                 </div>
                             </motion.div>
