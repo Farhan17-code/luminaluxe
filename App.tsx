@@ -344,7 +344,7 @@ const CartDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
                     <div className="grow flex flex-col justify-between py-1">
                       <div>
                         <h4 className="font-bold text-sm leading-tight mb-1 cursor-pointer hover:text-blue-600 transition-colors" onClick={() => { onClose(); navigate(`/product/${item.id.split('-')[0]}`); }}>{item.name}</h4>
-                        <p className="text-xs font-black text-blue-600">${item.price.toFixed(2)}</p>
+                        <p className="text-xs font-black text-blue-600">৳{item.price.toFixed(2)}</p>
                         {item.selectedSize && <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Size: <span className="text-black">{item.selectedSize}</span></p>}
                       </div>
                       <div className="flex items-center justify-between">
@@ -369,7 +369,7 @@ const CartDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-bold">Estimated Total</span>
-                  <span className="text-2xl font-black">${total.toFixed(2)}</span>
+                  <span className="text-2xl font-black">৳{total.toFixed(2)}</span>
                 </div>
               </div>
               <button
