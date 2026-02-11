@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion, type Variants } from 'motion/react';
 import { ArrowRight, Sparkles, Smartphone, Shirt, Home as HomeIcon, Watch, LayoutGrid, Heart, Plus } from 'lucide-react';
@@ -16,7 +15,7 @@ const CATEGORY_DATA = [
   },
   {
     name: 'Apparel' as Category,
-    image: 'https://i.pinimg.com/1200x/a4/da/37/a4da37949d0ca8ed36d25f7e9d8591cd.jpg',
+    image: 'https://images.unsplash.com/photo-1539109132314-3477524c8d35?q=80&w=1974&auto=format&fit=crop',
     icon: Shirt,
     desc: 'Minimalist designer wear'
   },
@@ -312,7 +311,7 @@ export const ProductCard: React.FC<{ product: Product }> = ({ product }) => {
         </div>
 
         <p className="text-[14px] font-black text-black">
-          ${product.price.toFixed(2)}
+          ৳{product.price.toFixed(2)}
         </p>
 
         {/* VARIANT SWATCHES - Using Thumbnails */}
