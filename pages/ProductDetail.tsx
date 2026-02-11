@@ -271,7 +271,7 @@ const ProductDetail: React.FC = () => {
               transition={{ delay: 0.2 }}
               className="py-10 border-y border-[#EDEDED]"
             >
-              <span className="text-6xl md:text-7xl font-black text-[#1A1A1A] tracking-tighter">${product.price.toFixed(2)}</span>
+              <span className="text-6xl md:text-7xl font-black text-[#1A1A1A] tracking-tighter">৳{product.price.toFixed(2)}</span>
               <p className="mt-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none">Price Includes VAT & Duties where applicable</p>
               {/* Write Review Link */}
               <div className="pt-8 border-t border-gray-100">
@@ -394,7 +394,7 @@ const ProductDetail: React.FC = () => {
                   <div className="aspect-4/5 rounded-[2.5rem] overflow-hidden bg-[#F9F9F9] relative">
                     <img src={p.image_url} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                     <div className="absolute top-5 left-5 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm">
-                      ${p.price.toFixed(2)}
+                      ৳{p.price.toFixed(2)}
                     </div>
                   </div>
                   <div>
