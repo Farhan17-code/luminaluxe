@@ -15,7 +15,7 @@ const CATEGORY_DATA = [
   },
   {
     name: 'Apparel' as Category,
-    image: 'https://images.unsplash.com/photo-1539109132314-3477524c8d35?q=80&w=1974&auto=format&fit=crop',
+    image: 'https://i.pinimg.com/1200x/a4/da/37/a4da37949d0ca8ed36d25f7e9d8591cd.jpg',
     icon: Shirt,
     desc: 'Minimalist designer wear'
   },
