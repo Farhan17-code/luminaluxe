@@ -1,4 +1,3 @@
-
 import { createClient } from '@supabase/supabase-js';
 import { Product, Order, User, Review, Coupon, CartItem, CustomerInsight } from '../types';
 
@@ -379,6 +378,21 @@ class SupabaseService {
     return data as Coupon;
   }
 
+  async getCouponByCode(code: string): Promise<Coupon | null> {
+    const { data, error } = await supabaseClient
+      .from('coupons')
+      .select('*')
+      .eq('code', code)
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error fetching coupon:', error);
+      return null;
+    }
+    return data as Coupon;
+  }
+
   async deleteCoupon(id: string): Promise<void> {
     const { error } = await supabaseClient
       .from('coupons')
@@ -567,4 +581,3 @@ if (import.meta.env.DEV) {
   console.log('- Run "await window.seedProducts()" to populate the database with initial data.');
   console.log('- Access "window.supabaseClient" for raw Supabase client.');
 }
-
