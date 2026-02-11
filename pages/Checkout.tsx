@@ -1,13 +1,29 @@
-import React, { useState } from 'react';
+
+import React, { useState, useMemo } from 'react';
 // Fix: Use motion/react for consistent animations and fix react-router imports
 import { motion, AnimatePresence } from 'motion/react';
-import { CreditCard, Truck, CheckCircle, ArrowLeft, ArrowRight, ShieldCheck, Tag, Loader2, XCircle } from 'lucide-react';
+import { CreditCard, Truck, CheckCircle, ArrowLeft, ArrowRight, ShieldCheck, Tag, Loader2, XCircle, ChevronDown } from 'lucide-react';
 import { useCart } from '../contexts';
 import { useNavigate } from 'react-router';
 import { supabase } from '../services/supabase';
 import { Coupon } from '../types';
 
 type Step = 'shipping' | 'payment' | 'success';
+
+// ── Bangladesh Divisions & Districts ──
+const BANGLADESH_DIVISIONS: Record<string, string[]> = {
+  'Barishal': ['Barguna', 'Barishal', 'Bhola', 'Jhalokati', 'Patuakhali', 'Pirojpur'],
+  'Chattogram': ['Bandarban', 'Brahmanbaria', 'Chandpur', 'Chattogram', 'Comilla', 'Cox\'s Bazar', 'Feni', 'Khagrachhari', 'Lakshmipur', 'Noakhali', 'Rangamati'],
+  'Dhaka': ['Dhaka', 'Faridpur', 'Gazipur', 'Gopalganj', 'Kishoreganj', 'Madaripur', 'Manikganj', 'Munshiganj', 'Narayanganj', 'Narsingdi', 'Rajbari', 'Shariatpur', 'Tangail'],
+  'Khulna': ['Bagerhat', 'Chuadanga', 'Jessore', 'Jhenaidah', 'Khulna', 'Kushtia', 'Magura', 'Meherpur', 'Narail', 'Satkhira'],
+  'Mymensingh': ['Jamalpur', 'Mymensingh', 'Netrokona', 'Sherpur'],
+  'Rajshahi': ['Bogura', 'Chapainawabganj', 'Joypurhat', 'Naogaon', 'Natore', 'Nawabganj', 'Pabna', 'Rajshahi', 'Sirajganj'],
+  'Rangpur': ['Dinajpur', 'Gaibandha', 'Kurigram', 'Lalmonirhat', 'Nilphamari', 'Panchagarh', 'Rangpur', 'Thakurgaon'],
+  'Sylhet': ['Habiganj', 'Moulvibazar', 'Sunamganj', 'Sylhet'],
+};
+
+const INPUT_CLASS = "w-full p-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-[#1A1A1A] placeholder:text-gray-400";
+const SELECT_CLASS = "w-full p-4 bg-white border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all text-[#1A1A1A] appearance-none cursor-pointer";
 
 const Checkout: React.FC = () => {
   const { cart, total, clearCart } = useCart();
@@ -18,6 +34,26 @@ const Checkout: React.FC = () => {
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [couponError, setCouponError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  // Shipping form state
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [address, setAddress] = useState('');
+  const [division, setDivision] = useState('');
+  const [district, setDistrict] = useState('');
+
+  const availableDistricts = useMemo(() => {
+    return division ? BANGLADESH_DIVISIONS[division] || [] : [];
+  }, [division]);
+
+  // Reset district when division changes
+  const handleDivisionChange = (value: string) => {
+    setDivision(value);
+    setDistrict('');
+  };
+
+  const isShippingValid = firstName.trim() !== '' && lastName.trim() !== '' && phone.trim() !== '' && address.trim() !== '' && division !== '' && district !== '';
 
   // Check for success query param
   React.useEffect(() => {
@@ -79,7 +115,7 @@ const Checkout: React.FC = () => {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 space-y-6">
         <h2 className="text-3xl font-black">Your cart is empty</h2>
-        <button onClick={() => navigate('/')} className="px-8 py-3 bg-blue-600 rounded-xl font-bold">Start Shopping</button>
+        <button onClick={() => navigate('/')} className="px-8 py-3 bg-blue-600 text-white rounded-xl font-bold">Start Shopping</button>
       </div>
     );
   }
@@ -89,15 +125,15 @@ const Checkout: React.FC = () => {
       {/* Stepper */}
       {step !== 'success' && (
         <div className="flex items-center justify-center mb-16 gap-4">
-          <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-blue-400' : 'text-emerald-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 'shipping' ? 'bg-blue-600 text-white' : 'bg-emerald-600 text-white'}`}>
+          <div className={`flex items-center gap-2 ${step === 'shipping' ? 'text-blue-600' : 'text-emerald-500'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${step === 'shipping' ? 'bg-blue-600' : 'bg-emerald-500'}`}>
               {step === 'shipping' ? '1' : <CheckCircle className="w-5 h-5" />}
             </div>
             <span className="text-sm font-bold hidden sm:inline">Shipping</span>
           </div>
-          <div className="w-12 h-px bg-white/10" />
-          <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-blue-400' : 'text-gray-500'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 'payment' ? 'bg-blue-600 text-white' : 'bg-white/10'}`}>2</div>
+          <div className="w-12 h-px bg-gray-300" />
+          <div className={`flex items-center gap-2 ${step === 'payment' ? 'text-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${step === 'payment' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-400'}`}>2</div>
             <span className="text-sm font-bold hidden sm:inline">Payment</span>
           </div>
         </div>
@@ -113,24 +149,47 @@ const Checkout: React.FC = () => {
             <div className="space-y-8">
               <h2 className="text-3xl font-black">Shipping Details</h2>
               <div className="space-y-4">
+                {/* First Name / Last Name */}
                 <div className="grid grid-cols-2 gap-4">
-                  <input type="text" placeholder="First Name" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                  <input type="text" placeholder="Last Name" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+                  <input type="text" placeholder="First Name *" value={firstName} onChange={e => setFirstName(e.target.value)} className={INPUT_CLASS} />
+                  <input type="text" placeholder="Last Name *" value={lastName} onChange={e => setLastName(e.target.value)} className={INPUT_CLASS} />
                 </div>
-                <input type="email" placeholder="Email Address" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                <input type="text" placeholder="Address" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                <div className="grid grid-cols-3 gap-4">
-                  <input type="text" placeholder="City" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                  <input type="text" placeholder="State" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
-                  <input type="text" placeholder="ZIP" className="w-full p-4 glass rounded-xl focus:ring-2 focus:ring-blue-500 outline-none" />
+                {/* Phone Number */}
+                <input type="tel" placeholder="Mobile Number *" value={phone} onChange={e => setPhone(e.target.value)} className={INPUT_CLASS} />
+                {/* Street Address */}
+                <input type="text" placeholder="Street Address *" value={address} onChange={e => setAddress(e.target.value)} className={INPUT_CLASS} />
+                {/* Division & District Dropdowns */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="relative">
+                    <select value={division} onChange={e => handleDivisionChange(e.target.value)} className={SELECT_CLASS} style={{ color: division ? '#1A1A1A' : '#9CA3AF' }}>
+                      <option value="" disabled>Division *</option>
+                      {Object.keys(BANGLADESH_DIVISIONS).map(div => (
+                        <option key={div} value={div} style={{ color: '#1A1A1A' }}>{div}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
+                  <div className="relative">
+                    <select value={district} onChange={e => setDistrict(e.target.value)} disabled={!division} className={`${SELECT_CLASS} ${!division ? 'opacity-50 cursor-not-allowed' : ''}`} style={{ color: district ? '#1A1A1A' : '#9CA3AF' }}>
+                      <option value="" disabled>City/District *</option>
+                      {availableDistricts.map(d => (
+                        <option key={d} value={d} style={{ color: '#1A1A1A' }}>{d}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                  </div>
                 </div>
               </div>
               <button
                 onClick={() => setStep('payment')}
-                className="w-full py-4 bg-blue-600 rounded-2xl font-bold flex items-center justify-center gap-2"
+                disabled={!isShippingValid}
+                className="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed shadow-xl shadow-blue-600/20 hover:shadow-blue-600/30"
               >
                 Proceed to Payment <ArrowRight className="w-5 h-5" />
               </button>
+              {!isShippingValid && (
+                <p className="text-xs text-center text-gray-400 -mt-4">Please fill in all required fields (*) to continue.</p>
+              )}
             </div>
             <OrderSummary 
               couponCode={couponCode} 
@@ -152,20 +211,20 @@ const Checkout: React.FC = () => {
             <div className="space-y-8">
               <div className="flex items-center justify-between">
                 <h2 className="text-3xl font-black">Secure Payment</h2>
-                <div className="flex items-center gap-2 text-emerald-400 text-xs font-bold bg-emerald-400/10 px-3 py-1.5 rounded-full">
+                <div className="flex items-center gap-2 text-emerald-500 text-xs font-bold bg-emerald-50 px-3 py-1.5 rounded-full">
                   <ShieldCheck className="w-4 h-4" /> SSL ENCRYPTED
                 </div>
               </div>
               <div className="space-y-4">
-                <div className="p-6 glass border-blue-500/50 border rounded-2xl flex items-center justify-between">
+                <div className="p-6 bg-white border-2 border-blue-500 rounded-2xl flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <CreditCard className="w-6 h-6 text-blue-400" />
+                    <CreditCard className="w-6 h-6 text-blue-500" />
                     <span className="font-bold">Credit / Debit Card</span>
                   </div>
                   <div className="w-4 h-4 rounded-full border-4 border-blue-500" />
                 </div>
-                <div className="p-8 glass rounded-2xl flex flex-col items-center justify-center space-y-4 text-center border border-white/5">
-                  <div className="w-12 h-12 bg-blue-500/20 text-blue-400 rounded-full flex items-center justify-center">
+                <div className="p-8 bg-white border border-gray-200 rounded-2xl flex flex-col items-center justify-center space-y-4 text-center">
+                  <div className="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center">
                     <ShieldCheck className="w-6 h-6" />
                   </div>
                   <div>
@@ -177,14 +236,14 @@ const Checkout: React.FC = () => {
               <div className="flex gap-4">
                 <button
                   onClick={() => setStep('shipping')}
-                  className="flex-grow py-4 glass rounded-2xl font-bold flex items-center justify-center gap-2"
+                  className="flex-grow py-4 bg-white border border-gray-300 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-50 transition-all"
                 >
                   <ArrowLeft className="w-5 h-5" /> Back
                 </button>
                 <button
                   onClick={handleComplete}
                   disabled={loading}
-                  className="flex-[2] py-4 bg-blue-600 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-900/30"
+                  className="flex-[2] py-4 bg-blue-600 text-white rounded-2xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-600/20"
                 >
                   {loading ? 'Processing...' : `Secure Checkout`}
                 </button>
@@ -200,14 +259,14 @@ const Checkout: React.FC = () => {
             initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}
             className="max-w-md mx-auto text-center space-y-8 py-20"
           >
-            <div className="w-24 h-24 bg-emerald-500/20 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8">
+            <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8">
               <CheckCircle className="w-12 h-12" />
             </div>
             <h1 className="text-5xl font-black">Transmission Received.</h1>
             <p className="text-gray-400">Your order has been logged into our neural network. We'll send tracking coordinates shortly.</p>
             <button
               onClick={() => navigate('/')}
-              className="w-full py-4 glass hover:bg-white/10 rounded-2xl font-bold transition-all"
+              className="w-full py-4 bg-white border border-gray-300 hover:bg-gray-50 rounded-2xl font-bold transition-all"
             >
               Back to Home
             </button>
@@ -250,7 +309,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   const finalTotal = Math.max(0, total + shipping - discountAmount);
 
   return (
-    <div className="glass p-8 rounded-[32px] h-fit sticky top-24">
+    <div className="bg-white border border-gray-200 p-8 rounded-[32px] h-fit sticky top-24 shadow-sm">
       <h3 className="text-xl font-bold mb-6">Summary</h3>
       <div className="space-y-4 mb-8">
         {cart.map(item => (
@@ -264,7 +323,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       {onCouponChange && (
         <div className="mb-8 space-y-3">
           <label className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-2">
-            <Tag className="w-3 h-3 text-blue-400" /> Promo Code
+            <Tag className="w-3 h-3 text-blue-500" /> Promo Code
           </label>
           <div className="flex gap-2">
             <input
@@ -272,26 +331,26 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
               value={couponCode}
               onChange={(e) => onCouponChange(e.target.value)}
               placeholder="e.g. WELCOME10"
-              className={`flex-grow p-3 bg-white/5 rounded-xl outline-none focus:ring-1 text-sm transition-all ${
-                couponError ? 'focus:ring-red-500 border border-red-500/30' : 
-                activeCoupon ? 'focus:ring-emerald-500 border border-emerald-500/30' : 'focus:ring-blue-500'
+              className={`flex-grow p-3 bg-white border rounded-xl outline-none focus:ring-1 text-sm transition-all ${
+                couponError ? 'focus:ring-red-500 border-red-300' : 
+                activeCoupon ? 'focus:ring-emerald-500 border-emerald-300' : 'border-gray-300 focus:ring-blue-500'
               }`}
             />
             <button
               onClick={onApplyCoupon}
               disabled={validatingCoupon || !couponCode}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50"
             >
               {validatingCoupon ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
             </button>
           </div>
           {couponError && (
-            <div className="flex items-center gap-1.5 text-red-400 text-[10px] font-bold uppercase tracking-wide">
+            <div className="flex items-center gap-1.5 text-red-500 text-[10px] font-bold uppercase tracking-wide">
               <XCircle className="w-3 h-3" /> {couponError}
             </div>
           )}
           {activeCoupon && (
-            <div className="flex items-center gap-1.5 text-emerald-400 text-[10px] font-bold uppercase tracking-wide">
+            <div className="flex items-center gap-1.5 text-emerald-500 text-[10px] font-bold uppercase tracking-wide">
               <CheckCircle className="w-3 h-3" /> Discount Applied: {activeCoupon.code}
             </div>
           )}
@@ -299,18 +358,18 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       )}
 
       {!onCouponChange && activeCoupon && (
-        <div className="mb-6 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between">
+        <div className="mb-6 p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">{activeCoupon.code}</span>
+            <Tag className="w-4 h-4 text-emerald-500" />
+            <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{activeCoupon.code}</span>
           </div>
-          <span className="text-xs font-black text-emerald-400">
+          <span className="text-xs font-black text-emerald-500">
             -{activeCoupon.discount_type === 'percentage' ? `${activeCoupon.value}%` : `$${activeCoupon.value.toFixed(2)}`}
           </span>
         </div>
       )}
 
-      <div className="space-y-4 pt-6 border-t border-white/10">
+      <div className="space-y-4 pt-6 border-t border-gray-200">
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Subtotal</span>
           <span>${total.toFixed(2)}</span>
@@ -320,7 +379,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
           <span>${shipping.toFixed(2)}</span>
         </div>
         {discountAmount > 0 && (
-          <div className="flex justify-between items-center text-sm text-emerald-400 font-bold">
+          <div className="flex justify-between items-center text-sm text-emerald-500 font-bold">
             <span className="flex items-center gap-1.5">
               Discount {activeCoupon?.discount_type === 'percentage' && `(${activeCoupon.value}%)`}
             </span>
@@ -333,7 +392,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         </div>
         <div className="flex justify-between items-center text-xl font-black pt-4">
           <span>Total</span>
-          <span className="text-blue-400">${finalTotal.toFixed(2)}</span>
+          <span className="text-blue-600">${finalTotal.toFixed(2)}</span>
         </div>
       </div>
     </div>
