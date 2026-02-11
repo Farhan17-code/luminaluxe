@@ -315,7 +315,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
         {cart.map(item => (
           <div key={item.id} className="flex justify-between items-center text-sm">
             <span className="text-gray-400">{item.name} x {item.quantity}</span>
-            <span className="font-bold">${(item.price * item.quantity).toFixed(2)}</span>
+            <span className="font-bold">৳{(item.price * item.quantity).toFixed(2)}</span>
           </div>
         ))}
       </div>
@@ -364,7 +364,7 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
             <span className="text-xs font-bold text-emerald-600 uppercase tracking-wider">{activeCoupon.code}</span>
           </div>
           <span className="text-xs font-black text-emerald-500">
-            -{activeCoupon.discount_type === 'percentage' ? `${activeCoupon.value}%` : `$${activeCoupon.value.toFixed(2)}`}
+            -{activeCoupon.discount_type === 'percentage' ? `${activeCoupon.value}%` : `৳${activeCoupon.value.toFixed(2)}`}
           </span>
         </div>
       )}
@@ -372,27 +372,27 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
       <div className="space-y-4 pt-6 border-t border-gray-200">
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Subtotal</span>
-          <span>${total.toFixed(2)}</span>
+          <span>৳{total.toFixed(2)}</span>
         </div>
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Shipping (Express)</span>
-          <span>${shipping.toFixed(2)}</span>
+          <span>৳{shipping.toFixed(2)}</span>
         </div>
         {discountAmount > 0 && (
           <div className="flex justify-between items-center text-sm text-emerald-500 font-bold">
             <span className="flex items-center gap-1.5">
               Discount {activeCoupon?.discount_type === 'percentage' && `(${activeCoupon.value}%)`}
             </span>
-            <span>-${discountAmount.toFixed(2)}</span>
+            <span>-৳{discountAmount.toFixed(2)}</span>
           </div>
         )}
         <div className="flex justify-between items-center text-sm text-gray-400">
           <span>Taxes (Estimated)</span>
-          <span>$0.00</span>
+          <span>৳0.00</span>
         </div>
         <div className="flex justify-between items-center text-xl font-black pt-4">
           <span>Total</span>
-          <span className="text-blue-600">${finalTotal.toFixed(2)}</span>
+          <span className="text-blue-600">৳{finalTotal.toFixed(2)}</span>
         </div>
       </div>
     </div>
