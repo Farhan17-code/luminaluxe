@@ -535,7 +535,7 @@ const Admin: React.FC = () => {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="bg-[#F8F8F8] p-5 rounded-4xl border border-gray-100">
                           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Price Node</p>
-                          <p className="text-2xl font-black text-[#1A1A1A]">${product.price.toFixed(2)}</p>
+                          <p className="text-2xl font-black text-[#1A1A1A]">৳{product.price.toFixed(2)}</p>
                         </div>
                         <div className="bg-[#F8F8F8] p-5 rounded-4xl border border-gray-100">
                           <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Inventory</p>
@@ -628,7 +628,7 @@ const Admin: React.FC = () => {
                         </span>
                       </div>
                       <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                        {coupon.discount_type === 'percentage' ? `${coupon.value}% Off Entire Order` : `$${coupon.value.toFixed(2)} Flat Discount`}
+                        {coupon.discount_type === 'percentage' ? `${coupon.value}% Off Entire Order` : `৳${coupon.value.toFixed(2)} Flat Discount`}
                       </p>
                     </>
                   )}
@@ -668,11 +668,11 @@ const Admin: React.FC = () => {
               </div>
               <div className="bg-white p-8 rounded-[2.5rem] border border-[#EDEDED] shadow-sm space-y-2">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Gross Archive Value</p>
-                <h4 className="text-4xl font-black">${customerInsights.reduce((sum, c) => sum + (c.total_spend || 0), 0).toFixed(2)}</h4>
+                <h4 className="text-4xl font-black">৳{customerInsights.reduce((sum, c) => sum + (c.total_spend || 0), 0).toFixed(2)}</h4>
               </div>
               <div className="bg-white p-8 rounded-[2.5rem] border border-[#EDEDED] shadow-sm space-y-2">
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Avg Acquisition Value</p>
-                <h4 className="text-4xl font-black">${(customerInsights.reduce((sum, c) => sum + (c.total_spend || 0), 0) / (customerInsights.length || 1)).toFixed(2)}</h4>
+                <h4 className="text-4xl font-black">৳{(customerInsights.reduce((sum, c) => sum + (c.total_spend || 0), 0) / (customerInsights.length || 1)).toFixed(2)}</h4>
               </div>
             </div>
 
@@ -711,7 +711,7 @@ const Admin: React.FC = () => {
                             </span>
                           </td>
                           <td className="px-8 py-6 text-sm font-black">
-                            ${customer.total_spend.toFixed(2)}
+                            ৳{customer.total_spend.toFixed(2)}
                           </td>
                           <td className="px-8 py-6 text-[11px] font-bold text-gray-400 uppercase tracking-widest">
                             {customer.last_purchase ? new Date(customer.last_purchase).toLocaleDateString() : 'N/A'}
