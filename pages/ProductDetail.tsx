@@ -234,7 +234,7 @@ const ProductDetail: React.FC = () => {
                         setSelectedVariant(variant);
                         setSelectedImage(variant.images?.[0] || product.image_url);
                       }}
-                      className={`w-14 h-14 rounded-full border-2 transition-all transform hover:scale-110 overflow-hidden ${selectedVariant?.color_name === variant.color_name ? 'border-black ring-2 ring-black ring-offset-2' : 'border-gray-100'}`}
+                      className={`w-8 h-8 rounded-full border-2 transition-all transform hover:scale-110 overflow-hidden ${selectedVariant?.color_name === variant.color_name ? 'border-black ring-2 ring-black ring-offset-2' : 'border-gray-100'}`}
                       title={variant.color_name}
                     >
                       <img src={variant.thumbnail_url || product.image_url} className="w-full h-full object-cover" />
