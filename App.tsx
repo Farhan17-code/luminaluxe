@@ -407,55 +407,85 @@ const CartDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen
   );
 };
 
-const Footer: React.FC = () => (
-  <footer className="bg-white border-t border-[#EDEDED] pt-24 pb-12 px-6 md:px-12 mt-24">
-    <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
-      <div className="space-y-6">
-        <h3 className="text-xl font-bold tracking-tighter text-[#1A1A1A]">LUMINA LUXE</h3>
-        <p className="text-sm text-gray-500 leading-relaxed font-medium">Elevating daily life through minimalist design and premium engineering. Our collection is curated for the modern aesthetic.</p>
-      </div>
-      <div className="space-y-8">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Shop Collection</h4>
-        <ul className="text-sm text-gray-500 space-y-4 font-medium">
-          <li className="hover:text-black cursor-pointer transition-colors">Electronics & Tech</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Designer Apparel</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Home & Living</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Premium Accessories</li>
-        </ul>
-      </div>
-      <div className="space-y-8">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Company</h4>
-        <ul className="text-sm text-gray-500 space-y-4 font-medium">
-          <li className="hover:text-black cursor-pointer transition-colors">About our Studio</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Sustainability Commit</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Careers</li>
-          <li className="hover:text-black cursor-pointer transition-colors">Press Inquiries</li>
-        </ul>
-      </div>
-      <div className="space-y-8">
-        <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Connect</h4>
-        <div className="flex gap-4">
-          <div className="w-12 h-12 border border-[#EDEDED] rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer group">
-            <Instagram className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+const Footer: React.FC = () => {
+  const [categories, setCategories] = useState<string[]>([]);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const cats = await (supabase as any).getCategories();
+        if (Array.isArray(cats)) {
+          setCategories(cats.map((c: any) => c.name));
+        }
+      } catch (err) {
+        console.error('Failed to load footer categories:', err);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  return (
+    <footer className="bg-white border-t border-[#EDEDED] pt-24 pb-12 px-6 md:px-12 mt-24">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 md:grid-cols-4 gap-16">
+        <div className="space-y-6">
+          <h3 className="text-xl font-bold tracking-tighter text-[#1A1A1A]">LUMINA LUXE</h3>
+          <p className="text-sm text-gray-500 leading-relaxed font-medium">Elevating daily life through minimalist design and premium engineering. Our collection is curated for the modern aesthetic.</p>
+        </div>
+        <div className="space-y-8">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Shop Collection</h4>
+          <ul className="text-sm text-gray-500 space-y-4 font-medium">
+            {categories.length > 0 ? (
+              categories.map(cat => (
+                <li key={cat}>
+                  <Link to={`/collection/${cat}`} className="hover:text-black cursor-pointer transition-colors block">
+                    {cat}
+                  </Link>
+                </li>
+              ))
+            ) : (
+              <>
+                <li className="hover:text-black cursor-pointer transition-colors">Electronics & Tech</li>
+                <li className="hover:text-black cursor-pointer transition-colors">Designer Apparel</li>
+                <li className="hover:text-black cursor-pointer transition-colors">Home & Living</li>
+                <li className="hover:text-black cursor-pointer transition-colors">Premium Accessories</li>
+              </>
+            )}
+          </ul>
+        </div>
+        <div className="space-y-8">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Company</h4>
+          <ul className="text-sm text-gray-500 space-y-4 font-medium">
+            <li className="hover:text-black cursor-pointer transition-colors">About our Studio</li>
+            <li className="hover:text-black cursor-pointer transition-colors">Sustainability Commit</li>
+            <li className="hover:text-black cursor-pointer transition-colors">Careers</li>
+            <li className="hover:text-black cursor-pointer transition-colors">Press Inquiries</li>
+          </ul>
+        </div>
+        <div className="space-y-8">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.3em]">Connect</h4>
+          <div className="flex gap-4">
+            <div className="w-12 h-12 border border-[#EDEDED] rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer group">
+              <Instagram className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+            </div>
+            <div className="w-12 h-12 border border-[#EDEDED] rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer group">
+              <Twitter className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+            </div>
           </div>
-          <div className="w-12 h-12 border border-[#EDEDED] rounded-2xl flex items-center justify-center hover:bg-black hover:text-white transition-all cursor-pointer group">
-            <Twitter className="w-5 h-5 text-gray-500 group-hover:text-white transition-colors" />
+          <div className="pt-4">
+            <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Newsletter</p>
+            <div className="mt-4 flex">
+              <input type="text" placeholder="Email Address" className="bg-[#F4F4F4] border-none rounded-l-xl px-4 py-3 text-xs grow outline-none" />
+              <button className="bg-[#1A1A1A] text-white px-4 py-3 rounded-r-xl text-[10px] font-black uppercase tracking-widest">Join</button>
+            </div>
           </div>
         </div>
-        <div className="pt-4">
-          <p className="text-[10px] font-black uppercase tracking-widest text-gray-400">Newsletter</p>
-          <div className="mt-4 flex">
-            <input type="text" placeholder="Email Address" className="bg-[#F4F4F4] border-none rounded-l-xl px-4 py-3 text-xs grow outline-none" />
-            <button className="bg-[#1A1A1A] text-white px-4 py-3 rounded-r-xl text-[10px] font-black uppercase tracking-widest">Join</button>
-          </div>
-        </div>
       </div>
-    </div>
-    <div className="max-w-[1440px] mx-auto border-t border-[#EDEDED] mt-24 pt-8 text-[9px] text-gray-400 font-bold uppercase tracking-[0.4em] text-center">
-      &copy; {new Date().getFullYear()} Lumina Luxe Studio. All rights reserved.
-    </div>
-  </footer>
-);
+      <div className="max-w-[1440px] mx-auto border-t border-[#EDEDED] mt-24 pt-8 text-[9px] text-gray-400 font-bold uppercase tracking-[0.4em] text-center">
+        &copy; {new Date().getFullYear()} Lumina Luxe Studio. All rights reserved.
+      </div>
+    </footer>
+  );
+};
 
 const PageTransitions: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
